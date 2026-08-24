@@ -10,6 +10,20 @@ DevFlow is an autonomous, AI-orchestrated engineering platform designed to autom
 - **Human-in-the-Loop**: Chat with the agent mid-session to provide refinement feedback before approving changes.
 - **One-Click PR Generation**: Automatically generates meaningful commit messages and PR descriptions based on the applied fixes and transitions Jira tickets to review.
 
+## 📹 Demo Video
+
+Watch a complete demonstration of **DevFlow** in action as it reads Jira tickets, executes the autonomous Gemini CLI FixAgent, streams live execution logs in real-time, displays interactive code diffs, and automatically opens a GitHub Pull Request:
+
+<div align="center">
+  <video src="demo/DevFlow.webm" width="100%" controls="controls" style="max-width: 800px; border-radius: 8px;">
+    Your browser does not support the video tag. <a href="demo/DevFlow.webm">Click here to watch or download the demo video</a>.
+  </video>
+  <p align="center">
+    <em>🎥 <strong>DevFlow Demo</strong> — Autonomous ticket resolution, real-time log streaming & PR generation.</em><br/>
+    🔗 <strong>Direct Video File:</strong> <a href="demo/DevFlow.webm"><code>demo/DevFlow.webm</code></a>
+  </p>
+</div>
+
 ## 🏗 System Architecture
 
 The core architecture operates over an Express backend that manages the frontend requests and maintains persistent streams with two MCP servers and the Gemini CLI.
