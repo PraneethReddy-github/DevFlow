@@ -277,7 +277,7 @@ export default function TicketDetailView({ ticket, onClose, onFix }) {
               )}
 
               <a 
-                href={`${process.env.JIRA_BASE_URL}/browse/${ticket.key}`} 
+                href={`${import.meta.env.VITE_JIRA_BASE_URL}/browse/${ticket.key}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 w-full py-4 border border-white/10 rounded-2xl text-sm font-bold text-slate-300 hover:bg-white/5 hover:text-white transition-all group"

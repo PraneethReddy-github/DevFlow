@@ -4,14 +4,17 @@ const simpleGit = require('simple-git');
 const mcpManager = require('../mcp/manager');
 const { parseJiraMarkdown } = require('../jiraHelpers');
 
+// The local clone folder carries the repository name.
+const repoDir = (ownerRepo, fallback) => (ownerRepo || '').split('/')[1] || fallback;
+
 class FixAgent {
     constructor(config) {
         this.config = config;
         this.logCallback = null;
         this.repoRoot = path.join(__dirname, '../../');
         this.gits = {
-            frontend: simpleGit(path.join(this.repoRoot, 'repo-frontend')),
-            backend: simpleGit(path.join(this.repoRoot, 'repo-backend'))
+            frontend: simpleGit(path.join(this.repoRoot, repoDir(process.env.GITHUB_FRONTEND_REPO, 'frontend'))),
+            backend: simpleGit(path.join(this.repoRoot, repoDir(process.env.GITHUB_BACKEND_REPO, 'backend')))
         };
         this.currentTicket = null;
     }
@@ -256,10 +259,12 @@ class FixAgent {
         try {
             this.log('system', `🚀 Pushing changes and raising PR for ${ticketId}...`);
 
-            const frontendOwner = (process.env.GITHUB_FRONTEND_REPO || 'Org/repo-frontend').split('/')[0];
-            const frontendRepo = (process.env.GITHUB_FRONTEND_REPO || 'Org/repo-frontend').split('/')[1];
-            const backendOwner = (process.env.GITHUB_BACKEND_REPO || 'Org/repo-backend').split('/')[0];
-            const backendRepo = (process.env.GITHUB_BACKEND_REPO || 'Org/repo-backend').split('/')[1];
+            const frontendOwner = (process.env.GITHUB_FRONTEND_REPO || '').split('/')[0];
+            const frontendRepo = (process.env.GITHUB_FRONTEND_REPO || '').split('/')[1];
+            const backendOwner = (process.env.GITHUB_BACKEND_REPO || '').split('/')[0];
+            const backendRepo = (process.env.GITHUB_BACKEND_REPO || '').split('/')[1];
+
+            if (!frontendRepo || !backendRepo) throw new Error('Set GITHUB_FRONTEND_REPO and GITHUB_BACKEND_REPO to owner/repo');
 
             // --- Step 1: Git — branch, commit, push for repos with changes ---
             const prUrls = [];
@@ -316,25 +321,25 @@ class FixAgent {
                 this.log('system', `⚠️ Jira comment failed: ${e.message}`);
             }
 
-            try {
+            if (process.env.JIRA_REVIEW_TRANSITION_ID) try {
                 this.log('system', '🔄 Transitioning Jira to In Review...');
                 await mcpManager.callTool('jira', 'jira_workflow', {
                     action: 'transition',
                     issueKey: ticketId,
-                    transitionId: '31'
+                    transitionId: process.env.JIRA_REVIEW_TRANSITION_ID
                 });
             } catch (e) {
                 this.log('system', `⚠️ Jira transition failed: ${e.message}`);
             }
 
-            try {
+            if (process.env.JIRA_REVIEWER_ACCOUNT_ID) try {
                 this.log('system', '👤 Reassigning to reviewer...');
                 // Use Jira REST API directly — MCP assign needs account ID, not display name
                 const auth = Buffer.from(`${process.env.JIRA_EMAIL}:${process.env.JIRA_API_TOKEN}`).toString('base64');
                 await fetch(`${process.env.JIRA_BASE_URL}/rest/api/3/issue/${ticketId}/assignee`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ accountId: 'REVIEWER_ACCOUNT_ID' })
+                    body: JSON.stringify({ accountId: process.env.JIRA_REVIEWER_ACCOUNT_ID })
                 });
             } catch (e) {
                 this.log('system', `⚠️ Jira reassign failed: ${e.message}`);

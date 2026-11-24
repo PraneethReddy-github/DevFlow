@@ -93,14 +93,22 @@ Create a `.env` file in the `server` directory with your Jira and GitHub credent
 JIRA_EMAIL=your.email@example.com
 JIRA_API_TOKEN=your_token
 JIRA_BASE_URL=https://your-domain.atlassian.net
-JIRA_PROJECT=SIM
+JIRA_PROJECT=PROJ
 JIRA_ASSIGNEE_ID=your_account_id
+JIRA_REVIEW_TRANSITION_ID=   # optional: moves the ticket after the PR
+JIRA_REVIEWER_ACCOUNT_ID=    # optional: reassigns the ticket after the PR
 
 GITHUB_TOKEN=your_personal_access_token
 GITHUB_USERNAME=your_username
 GITHUB_FRONTEND_REPO=Org/repo-frontend
 GITHUB_BACKEND_REPO=Org/repo-backend
 PORT=3001
+```
+
+Create a `.env` file in the `client` directory:
+```env
+VITE_JIRA_BASE_URL=https://your-domain.atlassian.net
+VITE_REVIEWERS=login1,login2
 ```
 
 ### Running Locally

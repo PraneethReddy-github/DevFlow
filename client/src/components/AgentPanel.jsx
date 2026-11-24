@@ -44,6 +44,8 @@ const ThinkingIndicator = ({ activity }) => (
     </div>
 );
 
+const allReviewers = (import.meta.env.VITE_REVIEWERS || '').split(',').map(r => r.trim()).filter(Boolean);
+
 export default function AgentPanel({ ticket, onClose }) {
   const [logs, setLogs] = useState([]);
   const [input, setInput] = useState('');
@@ -51,12 +53,10 @@ export default function AgentPanel({ ticket, onClose }) {
   const [currentActivity, setCurrentActivity] = useState('');
   const [result, setResult] = useState(null);
   const [prDetails, setPrDetails] = useState({ commitMsg: '', prDesc: '' });
-  const [selectedReviewers, setSelectedReviewers] = useState(['reviewer1', 'reviewer2', 'reviewer5']);
+  const [selectedReviewers, setSelectedReviewers] = useState(allReviewers);
   const [finalResult, setFinalResult] = useState(null);
   const logEndRef = useRef(null);
   const eventSourceRef = useRef(null);
-
-  const allReviewers = ['reviewer1', 'reviewer2', 'reviewer3', 'reviewer4', 'reviewer5'];
 
   const toggleReviewer = (login) => {
     setSelectedReviewers(prev => 
